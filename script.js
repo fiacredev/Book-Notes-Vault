@@ -191,5 +191,80 @@
     $("#form-notice").textContent = "";
   }
 
+  function validateForm() {
+    clearErrors();
+    let valid = true;
+    const title = fields.title.value;
+    const author = fields.author.value;
+    const pagesRaw = fields.pages.value;
+    const tag = fields.tag.value;
+    const dateAdded = fields.dateAdded.value;
+    const isbnRaw = fields.isbn.value;
+    const notes = fields.notes.value;
+    const markError = (name, message) => { setFieldError(name, message); valid = false; };
+
+    if (!title || !/^\S(?:.*\S)?$/.test(title) || /\s{2,}/.test(title)) markError("title", "Enter a title without leading/trailing or repeated spaces.");
+    else if (title.length > 180) markError("title", "Title must be 180 characters or fewer.");
+    else if (hasDuplicateWords(title)) markError("title", "Title contains a repeated adjacent word.");
+    if (!author || !/^\S(?:.*\S)?$/.test(author) || /\s{2,}/.test(author)) markError("author", "Enter an author without leading/trailing or repeated spaces.");
+    else if (author.length > 120) markError("author", "Author must be 120 characters or fewer.");
+    else if (hasRepeatedSurname(author)) markError("author", "This author list appears to repeat a surname. Check the names, or separate co-authors with commas.");
+    if (!/^(0|[1-9]\d*)$/.test(pagesRaw) || !Number.isSafeInteger(Number(pagesRaw)) || Number(pagesRaw) < 1 || Number(pagesRaw) > 100000) markError("pages", "Pages must be a whole number from 1 to 100,000.");
+    if (!/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/.test(tag)) markError("tag", "Use letters, with single spaces or hyphens between words.");
+    if (!validDate(dateAdded)) markError("dateAdded", "Enter a real date in YYYY-MM-DD format.");
+    if (isbnRaw.trim()) {
+      const isbn = extractIsbn(isbnRaw) || checksumValidIsbn(isbnRaw);
+      if (!isbn) markError("isbn", "No valid ISBN-10 or ISBN-13 found. Check the number or leave this field blank.");
+    }
+    if (notes.length > 10000) markError("notes", "Notes must be 10,000 characters or fewer.");
+
+    if (!valid) {
+      $("#form-notice").textContent = "Please correct the highlighted fields before saving.";
+      const firstInvalid = Object.keys(errorEls).find(name => errorEls[name].textContent);
+      if (firstInvalid) fields[firstInvalid].focus();
+    }
+    return valid;
+  }
+
+  function compileSearch() {
+    searchPattern = $("#search-pattern").value;
+    searchError = "";
+    searchRegex = null;
+    if (searchPattern) {
+      try { searchRegex = new RegExp(searchPattern, $("#case-insensitive").checked ? "iu" : "u"); }
+      catch (error) { searchError = `Invalid regular expression: ${error.message}`; }
+    }
+    const feedback = $("#search-feedback");
+    feedback.textContent = searchError || (searchPattern ? "Regex search is active." : "");
+    feedback.classList.toggle("error", Boolean(searchError));
+    renderBooks();
+  }
+
+  function matchesSearch(book) {
+    if (!searchPattern || searchError || !searchRegex) return !searchError;
+    const haystack = [book.title, book.author, book.tag, book.isbn, book.notes, book.dateAdded].join("\n");
+    searchRegex.lastIndex = 0;
+    return searchRegex.test(haystack);
+  }
+
+  function highlight(value) {
+    const text = String(value ?? "");
+    if (!searchPattern || !searchRegex || searchError) return escapeHtml(text);
+    searchRegex.lastIndex = 0;
+    let output = "";
+    let last = 0;
+    let match;
+    const regex = new RegExp(searchRegex.source, searchRegex.flags.replace("g", "") + "g");
+    let count = 0;
+    while ((match = regex.exec(text)) !== null && count < 200) {
+      if (match[0] === "") { regex.lastIndex++; continue; }
+      output += escapeHtml(text.slice(last, match.index));
+      output += `<mark>${escapeHtml(match[0])}</mark>`;
+      last = match.index + match[0].length;
+      count++;
+    }
+    output += escapeHtml(text.slice(last));
+    return output;
+  }
 
 })();
