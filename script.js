@@ -347,4 +347,107 @@
     updateTarget(totalPages);
   }
 
+  function renderWeeklyChart(dates, counts) {
+    const chart = $("#weekly-chart");
+    const max = Math.max(1, ...counts);
+    chart.replaceChildren();
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    dates.forEach((date, index) => {
+      const dateObj = new Date(`${date}T12:00:00`);
+      const col = document.createElement("div");
+      col.className = "chart-column";
+      col.innerHTML = `<div class="chart-bar-wrap"><div class="chart-bar${index === 6 ? " today" : ""}" style="height:${Math.max(3, counts[index] / max * 100)}%"><span class="chart-value">${counts[index]}</span></div></div><span class="chart-day">${days[dateObj.getDay()]}</span>`;
+      chart.appendChild(col);
+    });
+    chart.setAttribute("aria-label", `Books added in the last seven calendar days: ${dates.map((date, i) => `${date}: ${counts[i]}`).join(", ")}.`);
+  }
+
+  function updateTarget(totalPages) {
+    const target = settings.pageTarget;
+    const progress = Math.min(100, Math.round(totalPages / target * 100));
+    $("#target-current").textContent = totalPages.toLocaleString();
+    $("#target-total").textContent = `/ ${target.toLocaleString()} pages`;
+    $("#target-progress").setAttribute("aria-valuemax", String(target));
+    $("#target-progress").setAttribute("aria-valuenow", String(Math.min(totalPages, target)));
+    $("#target-progress").setAttribute("aria-valuetext", `${totalPages.toLocaleString()} of ${target.toLocaleString()} pages`);
+    $("#target-progress-fill").style.width = `${progress}%`;
+    const message = $("#target-message");
+    if (totalPages > target) {
+      message.textContent = `Target exceeded by ${(totalPages - target).toLocaleString()} pages. Consider increasing your target.`;
+      message.classList.add("over");
+      message.setAttribute("aria-live", "assertive");
+    } else {
+      message.textContent = `${(target - totalPages).toLocaleString()} pages remaining. You're within your page target.`;
+      message.classList.remove("over");
+      message.setAttribute("aria-live", "polite");
+    }
+  }
+
+  function resetForm({ focus = false } = {}) {
+    form.reset();
+    $("#editing-id").value = "";
+    $("#date-added").value = localDate();
+    $("#form-title").textContent = "Add a book";
+    $("#save-book").textContent = "Save book";
+    $("#cancel-edit").classList.add("hidden");
+    clearErrors();
+    if (focus) fields.title.focus();
+  }
+
+  function startEdit(id) {
+    const book = books.find(item => item.id === id);
+    if (!book) return;
+    $("#editing-id").value = book.id;
+    fields.title.value = book.title;
+    fields.author.value = book.author;
+    fields.pages.value = String(book.pages);
+    fields.tag.value = book.tag;
+    fields.dateAdded.value = book.dateAdded;
+    fields.isbn.value = book.isbn || "";
+    fields.notes.value = book.notes || "";
+    $("#form-title").textContent = "Edit book";
+    $("#save-book").textContent = "Save changes";
+    $("#cancel-edit").classList.remove("hidden");
+    clearErrors();
+    $("#book-form-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    fields.title.focus({ preventScroll: true });
+    announce(`Editing ${book.title}.`);
+  }
+
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    if (!validateForm()) return;
+    const editingId = $("#editing-id").value;
+    const existing = books.find(book => book.id === editingId);
+    const isbnRaw = fields.isbn.value.trim();
+    const isbn = isbnRaw ? (extractIsbn(isbnRaw) || checksumValidIsbn(isbnRaw)) : "";
+    const timestamp = nowIso();
+    const record = {
+      id: existing ? existing.id : makeBookId(),
+      title: fields.title.value,
+      author: fields.author.value,
+      pages: Number(fields.pages.value),
+      tag: fields.tag.value,
+      dateAdded: fields.dateAdded.value,
+      isbn: isbn || "",
+      notes: fields.notes.value,
+      createdAt: existing ? existing.createdAt : timestamp,
+      updatedAt: timestamp
+    };
+    const next = existing ? books.map(book => book.id === editingId ? record : book) : [...books, record];
+    if (next.length > MAX_BOOKS) {
+      $("#form-notice").textContent = `Your vault is limited to ${MAX_BOOKS.toLocaleString()} books.`;
+      return;
+    }
+    const previous = books;
+    books = next;
+    if (!persistBooks()) { books = previous; return; }
+    renderBooks();
+    resetForm();
+    const message = existing ? `${record.title} updated.` : `${record.title} added to your vault.`;
+    $("#form-notice").textContent = message;
+    announce(message);
+    $("#library").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  
 })();
