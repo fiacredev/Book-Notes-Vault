@@ -481,5 +481,70 @@
     if (action === "delete") askDelete(id);
   }
 
-  
+  function downloadJson() {
+    const payload = { schemaVersion: 1, exportedAt: nowIso(), app: "Book & Notes Vault", books };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `book-notes-vault-${localDate()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setSettingsFeedback(`Exported ${books.length} ${books.length === 1 ? "book" : "books"} to JSON.`);
+    announce("JSON backup downloaded.");
+  }
+
+  async function importJson(file) {
+    if (!file) return;
+    if (file.size > MAX_IMPORT_BYTES) {
+      setSettingsFeedback("File is too large. Choose a JSON file under 5 MB.", true);
+      return;
+    }
+    try {
+      const text = await file.text();
+      let parsed;
+      try { parsed = JSON.parse(text); }
+      catch { throw new Error("This file is not valid JSON."); }
+      const importedBooks = Array.isArray(parsed) ? parsed : parsed && Array.isArray(parsed.books) ? parsed.books : null;
+      if (!importedBooks) throw new Error('Expected a JSON array or an object with a "books" array.');
+      const validation = validateBookList(importedBooks);
+      if (validation.error) throw new Error(validation.error);
+      const merge = $("#merge-import").checked;
+      let next;
+      if (merge) {
+        const byId = new Map(books.map(book => [book.id, book]));
+        for (const book of importedBooks) byId.set(book.id, { isbn: "", notes: "", ...book });
+        next = [...byId.values()];
+      } else {
+        next = importedBooks.map(book => ({ isbn: "", notes: "", ...book }));
+      }
+      if (next.length > MAX_BOOKS) throw new Error(`Import would exceed the ${MAX_BOOKS.toLocaleString()} book limit.`);
+      const previous = books;
+      books = next;
+      if (!persistBooks()) { books = previous; throw new Error("Could not save imported data. Your previous in-memory library was restored."); }
+      renderBooks();
+      setSettingsFeedback(`Imported ${importedBooks.length} books${merge ? " into your library" : " (replaced the previous library)"}.`);
+      announce(`Import successful. ${importedBooks.length} books processed.`);
+    } catch (error) {
+      setSettingsFeedback(`Import failed: ${error.message}`, true);
+      announce(`Import failed: ${error.message}`);
+    } finally {
+      $("#import-file").value = "";
+    }
+  }
+
+  function clearVault() {
+    if (!books.length) { setSettingsFeedback("Your vault is already empty."); return; }
+    if (!window.confirm(`Delete all ${books.length} books and notes from this browser? Export a backup first if you may need them.`)) return;
+    const previous = books;
+    books = [];
+    if (!persistBooks()) { books = previous; return; }
+    resetForm();
+    renderBooks();
+    setSettingsFeedback("All books and notes have been removed from this browser.");
+    announce("Vault cleared.");
+  }
+
 })();
