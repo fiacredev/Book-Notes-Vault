@@ -267,4 +267,84 @@
     return output;
   }
 
+  function getVisibleBooks() {
+    const visible = books.filter(matchesSearch);
+    const [key, direction] = $("#sort-by").value.split("-");
+    const factor = direction === "desc" ? -1 : 1;
+    const keyMap = { date: "dateAdded", title: "title", author: "author", pages: "pages" };
+    const prop = keyMap[key] || "dateAdded";
+    return visible.sort((a, b) => {
+      let result;
+      if (prop === "pages") result = Number(a.pages) - Number(b.pages);
+      else result = String(a[prop] ?? "").localeCompare(String(b[prop] ?? ""), undefined, { sensitivity: "base", numeric: true });
+      return result * factor || a.id.localeCompare(b.id);
+    });
+  }
+
+  function bookActions(book) {
+    const id = escapeHtml(book.id);
+    return `<div class="row-actions"><button class="action-button" type="button" data-action="edit" data-id="${id}" aria-label="Edit ${escapeHtml(book.title)}">Edit</button><button class="action-button delete" type="button" data-action="delete" data-id="${id}" aria-label="Delete ${escapeHtml(book.title)}">Delete</button></div>`;
+  }
+
+  function renderBooks() {
+    const visible = getVisibleBooks();
+    const tbody = $("#books-table-body");
+    const cards = $("#books-cards");
+    tbody.replaceChildren();
+    cards.replaceChildren();
+    for (const book of visible) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td class="book-title-cell"><strong>${highlight(book.title)}</strong>${book.isbn ? `<small>ISBN: ${highlight(book.isbn)}</small>` : ""}</td><td>${highlight(book.author)}</td><td>${Number(book.pages).toLocaleString()}</td><td><span class="tag-chip">${highlight(book.tag)}</span></td><td>${escapeHtml(book.dateAdded)}</td><td>${bookActions(book)}</td>`;
+      tbody.appendChild(tr);
+
+      const card = document.createElement("article");
+      card.className = "book-card";
+      card.innerHTML = `<h3>${highlight(book.title)}</h3><p class="card-author">by ${highlight(book.author)}</p><div class="card-meta"><span class="tag-chip">${highlight(book.tag)}</span><span>${Number(book.pages).toLocaleString()} pages</span><span>${escapeHtml(book.dateAdded)}</span></div>${book.isbn ? `<p class="hint">ISBN: ${highlight(book.isbn)}</p>` : ""}${book.notes ? `<p class="card-notes">${highlight(book.notes.length > 420 ? book.notes.slice(0, 420) + "…" : book.notes)}</p>` : ""}<div class="card-actions">${bookActions(book)}</div>`;
+      cards.appendChild(card);
+    }
+    const isEmpty = visible.length === 0;
+    $("#empty-state").classList.toggle("visible", isEmpty);
+    $("#library-table-wrap").classList.toggle("hidden", isEmpty);
+    cards.classList.toggle("hidden", isEmpty);
+    if (isEmpty && books.length && !searchError) {
+      $("#empty-state h3").textContent = "No matching books";
+      $("#empty-state p").textContent = "Try a different regular expression or clear the search field.";
+      $("#empty-add-book").textContent = "Add a new book";
+    } else {
+      $("#empty-state h3").textContent = "Your bookshelf is waiting";
+      $("#empty-state p").textContent = "Add your first book to start building your personal vault.";
+      $("#empty-add-book").textContent = "Add your first book";
+    }
+    $("#library-count").textContent = `${visible.length} of ${books.length} ${books.length === 1 ? "book" : "books"} shown`;
+    if (searchError) {
+      $("#empty-state").classList.remove("visible");
+      $("#library-table-wrap").classList.toggle("hidden", books.length === 0);
+      cards.classList.toggle("hidden", books.length === 0);
+    }
+    renderDashboard();
+  }
+
+  function renderDashboard() {
+    const totalPages = books.reduce((sum, book) => sum + Number(book.pages), 0);
+    const tagCounts = new Map();
+    books.forEach(book => tagCounts.set(book.tag, (tagCounts.get(book.tag) || 0) + 1));
+    const topTag = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];
+    const today = new Date();
+    const weekDates = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(today);
+      date.setHours(12, 0, 0, 0);
+      date.setDate(today.getDate() - (6 - index));
+      return localDate(date);
+    });
+    const weeklyCounts = weekDates.map(date => books.filter(book => book.dateAdded === date).length);
+    const weekTotal = weeklyCounts.reduce((a, b) => a + b, 0);
+    $("#stat-books").textContent = books.length.toLocaleString();
+    $("#stat-pages").textContent = totalPages.toLocaleString();
+    $("#stat-tag").textContent = topTag ? topTag[0] : "—";
+    $("#stat-tag").title = topTag ? `${topTag[1]} book(s)` : "No tags yet";
+    $("#stat-week").textContent = weekTotal.toLocaleString();
+    renderWeeklyChart(weekDates, weeklyCounts);
+    updateTarget(totalPages);
+  }
+
 })();
