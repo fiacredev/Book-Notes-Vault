@@ -449,5 +449,37 @@
     announce(message);
     $("#library").scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  function askDelete(id) {
+    const book = books.find(item => item.id === id);
+    if (!book) return;
+    pendingDeleteId = id;
+    $("#delete-dialog-description").textContent = `Delete “${book.title}” and its notes from this browser? This cannot be undone unless you have a backup.`;
+    lastFocusedBeforeDialog = document.activeElement;
+    const dialog = $("#delete-dialog");
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else if (window.confirm(`Delete "${book.title}" and its notes?`)) deleteBook(id);
+    if (dialog.open) $("#confirm-delete").focus();
+  }
+
+  function deleteBook(id) {
+    const book = books.find(item => item.id === id);
+    if (!book) return;
+    const previous = books;
+    books = books.filter(item => item.id !== id);
+    if (!persistBooks()) { books = previous; return; }
+    if ($("#editing-id").value === id) resetForm();
+    renderBooks();
+    announce(`${book.title} deleted.`);
+  }
+
+  function handleRecordAction(event) {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const { action, id } = button.dataset;
+    if (action === "edit") startEdit(id);
+    if (action === "delete") askDelete(id);
+  }
+
   
 })();
