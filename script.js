@@ -115,4 +115,81 @@
     if (hasRepeatedSurname(record.author)) return `Author list for "${record.title}" appears to repeat a surname.`;
     return null;
   }
+
+  function validateBookList(value) {
+    if (!Array.isArray(value)) return { error: "JSON must contain an array of books, or an object with a books array." };
+    if (value.length > MAX_BOOKS) return { error: `The vault can contain at most ${MAX_BOOKS.toLocaleString()} books.` };
+    const ids = new Set();
+    for (let i = 0; i < value.length; i++) {
+      const error = validateBookRecord(value[i]);
+      if (error) return { error: `Book ${i + 1}: ${error}` };
+      if (ids.has(value[i].id)) return { error: `Duplicate ID "${value[i].id}" found in the imported file.` };
+      ids.add(value[i].id);
+    }
+    return { books: value };
+  }
+
+  function makeBookId() {
+    const used = new Set(books.map(book => book.id));
+    let highest = 0;
+    for (const id of used) {
+      const match = /^rec_(\d+)$/.exec(id);
+      if (match) highest = Math.max(highest, Number(match[1]));
+    }
+    let candidate = `rec_${pad(highest + 1)}`;
+    while (used.has(candidate)) candidate = `rec_${pad(++highest + 1)}`;
+    return candidate;
+  }
+
+  function persistBooks() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+      return true;
+    } catch (error) {
+      console.error("Could not save vault:", error);
+      announce("Could not save changes. Browser storage may be full or disabled; export a backup if possible.");
+      return false;
+    }
+  }
+
+  function persistSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); return true; }
+    catch (error) { console.error("Could not save settings:", error); announce("Could not save settings in this browser."); return false; }
+  }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const result = validateBookList(parsed);
+        if (result.error) throw new Error(result.error);
+        books = result.books.map(book => ({ isbn: "", notes: "", ...book }));
+      }
+    } catch (error) {
+      books = [];
+      announce(`Saved library could not be loaded: ${error.message} Your current session starts with an empty library; the stored data has not been overwritten yet.`);
+      console.error(error);
+    }
+    try {
+      const rawSettings = localStorage.getItem(SETTINGS_KEY);
+      if (rawSettings) {
+        const parsed = JSON.parse(rawSettings);
+        if (parsed && Number.isSafeInteger(parsed.pageTarget) && parsed.pageTarget >= 1 && parsed.pageTarget <= 10000000) {
+          settings.pageTarget = parsed.pageTarget;
+        }
+      }
+    } catch (error) { console.warn("Settings could not be loaded:", error); }
+  }
+
+  function setFieldError(name, message) {
+    errorEls[name].textContent = message;
+    fields[name].setAttribute("aria-invalid", message ? "true" : "false");
+  }
+  function clearErrors() {
+    Object.keys(errorEls).forEach(name => setFieldError(name, ""));
+    $("#form-notice").textContent = "";
+  }
+
+
 })();
