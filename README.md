@@ -1,15 +1,15 @@
-📚 Book & Notes Vault
+ Book & Notes Vault
 
 A browser-based library manager for organizing books, storing notes, tracking page targets, and searching your collection using regular expressions. Features a clean green-and-white theme with local storage and JSON backups.
 
-1. 🎨 Chosen Theme: Green & White
+1. Chosen Theme: Green & White
 
 Green: Represents growth, learning, and focus.
 White: Provides a clean, simple, readable interface.
 Design: Responsive layouts, green buttons and tags, clear error messages, and visible focus indicators.
 
 
-2. ✨ Features
+2. Features
 
 Add, edit, and delete books.
 Store titles, authors, pages, tags, dates, ISBNs, and notes.
@@ -44,7 +44,7 @@ book|notes — match either word.
 
 Search supports Unicode and optional case-insensitive matching.
 
-4. ⌨️ Keyboard Map
+4.  Keyboard Map
 
 Key	Action
 Tab / Shift + Tab	Navigate between controls
@@ -67,7 +67,7 @@ Escape user content before rendering it as HTML.
 
 Accessibility also depends on the accompanying HTML and CSS.
 
-6. 🚀 How to Run
+6.  How to Run
 
 Requirements: A modern browser and the application's HTML, CSS, and JavaScript files.
 
@@ -80,7 +80,7 @@ Open http://localhost:8000 in your browser.
 
 No backend is required.
 
-7. 🧪 How to Run Tests
+7.  How to Run Tests
 
 The project does not currently include automated tests. Test manually or configure Vitest for unit tests and Playwright for browser tests.
 
@@ -103,7 +103,7 @@ npm run test:e2e
 
 These commands require the corresponding dependencies, scripts, and test configuration.
 
-8. 💾 Storage & Privacy
+8. Storage & Privacy
 
 Books and settings are saved in browser localStorage:
 
@@ -112,7 +112,7 @@ book-notes-vault.settings.v1
 
 Data is not automatically synchronized to the cloud or encrypted by the application. Export regular JSON backups and store them securely.
 
-9. ⚠️ Limitations
+9.  Limitations
 
 No cloud synchronization or user accounts.
 Complex regex patterns may affect performance.
@@ -121,7 +121,7 @@ Author surname checks may produce false positives.
 The page target measures total library pages, not pages actually read.
 Automated tests must be configured separately.
 
-10. 🔮 Future Improvements
+10.  Future Improvements
 
 Add reading status and ratings.
 Improve Unicode tag support.
@@ -129,7 +129,7 @@ Add pagination and advanced filters.
 Expand automated testing and accessibility checks.
 Add schema migrations and optional encrypted backups.
 
-11. 📄 License
+11.  License
 
 Choose and add a license before distributing the project.
 
