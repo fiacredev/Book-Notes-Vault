@@ -1,0 +1,163 @@
+{
+  "reportVersion": "1.0",
+  "assignmentId": "assignment-1791908858525-iwmmflb",
+  "assignmentName": "Summative Responsive Ui",
+  "generatedAt": 1791909037533,
+  "metrics": {
+    "assignmentId": "assignment-1791908858525-iwmmflb",
+    "authorship": {
+      "totalLines": 2631,
+      "manualLines": 5,
+      "permittedAILines": 931,
+      "prohibitedAILines": 100,
+      "flaggedAILines": 70,
+      "authorshipPercentage": 100,
+      "prohibitedPercentage": 7
+    },
+    "ownership": {
+      "score": 99,
+      "filesReviewed": 4,
+      "filesUnreviewed": 0,
+      "unreviewedLines": 0,
+      "averageReviewTimeMs": 25700000
+    },
+    "violations": [
+      {
+        "type": "tracking-gap",
+        "severity": "low",
+        "message": "No tracking activity for 66601 seconds during assignment window",
+        "details": {
+          "startTime": 1791842400000,
+          "endTime": 1791909001843,
+          "durationSeconds": 66601
+        },
+        "firstDetectedAt": 1791909001843,
+        "lastDetectedAt": 1791909001843,
+        "count": 1
+      }
+    ],
+    "rawEvents": [
+      {
+        "id": 1,
+        "timestamp": 1791909001843,
+        "tool": "claude-code",
+        "eventType": "code-generated",
+        "linesOfCode": 2631,
+        "charactersCount": 17773,
+        "filePath": "/Users/Fiacre/Documents/summative_ui",
+        "language": "plaintext",
+        "metadata": {
+          "manual": true,
+          "source": "manual-typing",
+          "duration": 35000
+        },
+        "reviewQuality": "high",
+        "isReviewed": true,
+        "isAgentMode": false,
+        "source": "manual",
+        "detectionMethod": "manual-typing",
+        "confidence": "high",
+        "assignmentId": "assignment-1791908858525-iwmmflb"
+      }
+    ],
+    "fileReviews": [],
+    "trackingGaps": [
+      {
+        "startTime": 1791842400000,
+        "endTime": 1791909001843,
+        "durationSeconds": 66601
+      }
+    ]
+  },
+  "policy": {
+    "maxAuthorshipPercentage": 100,
+    "minOwnershipScore": 70,
+    "exemptFileGlobs": [
+      "**/README*",
+      "**/*.md",
+      "**/package.json",
+      "**/package-lock.json",
+      "**/npm-shrinkwrap.json",
+      "**/yarn.lock",
+      "**/pnpm-lock.yaml",
+      "**/poetry.lock",
+      "**/Pipfile.lock",
+      "**/Gemfile.lock",
+      "**/Cargo.lock",
+      "**/composer.lock",
+      "**/go.sum",
+      "**/.gitignore",
+      "**/LICENSE*",
+      "**/tsconfig.json",
+      "**/.eslintrc*",
+      "**/.prettierrc*",
+      "**/node_modules/**",
+      "**/bower_components/**",
+      "**/.npm/**",
+      "**/venv/**",
+      "**/.venv/**",
+      "**/env/**",
+      "**/__pycache__/**",
+      "**/.tox/**",
+      "**/.mypy_cache/**",
+      "**/.pytest_cache/**",
+      "**/.ruff_cache/**",
+      "**/site-packages/**",
+      "**/.git/**",
+      "**/.hg/**",
+      "**/.svn/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/out/**",
+      "**/coverage/**",
+      "**/.nyc_output/**",
+      "**/.next/**",
+      "**/.nuxt/**",
+      "**/target/**",
+      "**/vendor/**",
+      "**/.idea/**",
+      "**/.vs/**",
+      "**/*.pyc",
+      "**/*.pyo",
+      "**/*.min.js",
+      "**/*.bundle.js",
+      "**/*.map",
+      "**/package-lock.json",
+      "**/npm-shrinkwrap.json",
+      "**/yarn.lock",
+      "**/pnpm-lock.yaml",
+      "**/poetry.lock",
+      "**/Pipfile.lock",
+      "**/Gemfile.lock",
+      "**/Cargo.lock",
+      "**/composer.lock",
+      "**/go.sum"
+    ],
+    "prohibitedMethods": [
+      "external-file-change",
+      "git-commit-marker"
+    ],
+    "permittedMethods": [
+      "inline-completion-api"
+    ],
+    "flaggedMethods": [
+      "large-paste",
+      "change-velocity"
+    ],
+    "minLargePasteReviewTimeMs": 5000,
+    "maxTrackingGapSeconds": 1800
+  },
+  "exclusionAudit": [
+    {
+      "id": 1,
+      "timestamp": 1791908858526,
+      "globs": [],
+      "source": "assignment-activated"
+    }
+  ],
+  "studentIdentifier": "f.uwimpuhwe@alustudent.com",
+  "integrity": {
+    "algorithm": "sha256",
+    "hash": "850bbc11c8132039e09e3fae7a2a2def9e7b43378ceeb338a107a4f0ba56cf17"
+  }
+}
