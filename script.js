@@ -547,4 +547,19 @@
     announce("Vault cleared.");
   }
 
+  function saveTarget() {
+    const value = $("#target-input").value;
+    if (!/^[1-9]\d*$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) > 10000000) {
+      announce("Enter a page target from 1 to 10,000,000.");
+      $("#target-input").setAttribute("aria-invalid", "true");
+      $("#target-input").focus();
+      return;
+    }
+    $("#target-input").setAttribute("aria-invalid", "false");
+    settings.pageTarget = Number(value);
+    persistSettings();
+    renderDashboard();
+    announce(`Page target saved: ${settings.pageTarget.toLocaleString()} pages.`);
+  }
+
 })();
