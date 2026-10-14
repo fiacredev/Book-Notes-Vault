@@ -27,7 +27,6 @@ Everything lives in your browser's `localStorage`. Export a JSON backup whenever
 14. [Storage, import/export, and privacy](#storage-importexport-and-privacy)
 15. [Responsive breakpoints](#responsive-breakpoints)
 16. [Limitations](#limitations)
-17. [License](#license)
 
 ---
 
@@ -35,13 +34,13 @@ Everything lives in your browser's `localStorage`. Export a JSON backup whenever
 
 **Book & Notes Vault** — a reading-room aesthetic in warm paper tones with deep library green.
 
-| Token | Value | Role |
-| --- | --- | --- |
-| `--cream` | `#f7f4eb` | Page background |
-| `--paper` | `#fffdf7` | Card and panel surfaces |
-| `--ink` | `#26372c` | Primary text |
-| `--green` | `#244a38` | Buttons, links, active nav |
-| `--brown` | `#825a3c` | Accents and book-stack artwork |
+| Token      | Value     | Role                                 |
+| ---------- | --------- | ------------------------------------ |
+| `--cream`  | `#f7f4eb` | Page background                      |
+| `--paper`  | `#fffdf7` | Card and panel surfaces              |
+| `--ink`    | `#26372c` | Primary text                         |
+| `--green`  | `#244a38` | Buttons, links, active nav           |
+| `--brown`  | `#825a3c` | Accents and book-stack artwork       |
 | `--danger` | `#8c3028` | Delete actions and over-target state |
 
 Green reads as growth and focus; the cream/paper neutrals keep long reading sessions comfortable instead of clinical. All foreground/background pairs were chosen to clear WCAG AA contrast for body text.
@@ -54,12 +53,12 @@ Green reads as growth and focus; the cream/paper neutrals keep long reading sess
 
 Hosted on GitHub Pages. The same app and the test suite are both reachable from the deployed build:
 
-| Page | URL |
-| --- | --- |
-| App | <https://fiacredev.github.io/Book-Notes-Vault/> |
+| Page       | URL                                                       |
+| ---------- | --------------------------------------------------------- |
+| App        | <https://fiacredev.github.io/Book-Notes-Vault/>           |
 | Test suite | <https://fiacredev.github.io/Book-Notes-Vault/tests.html> |
-| Seed data | <https://fiacredev.github.io/Book-Notes-Vault/seed.json> |
-| Repository | <https://github.com/fiacredev/Book-Notes-Vault> |
+| Seed data  | <https://fiacredev.github.io/Book-Notes-Vault/seed.json>  |
+| Repository | <https://github.com/fiacredev/Book-Notes-Vault>           |
 
 To republish after a change, push to `main` and GitHub Pages serves it.
 
@@ -70,29 +69,34 @@ To republish after a change, push to `main` and GitHub Pages serves it.
 ## Features
 
 **Catalog**
+
 - Add, edit, and delete books with inline confirmation
 - Fields: title, author, pages, tag, date added, ISBN, free-form notes
 - Sort by title, author, date added, or page count, each ascending and descending
 - Table layout on tablet and up, card layout on mobile
 
 **Regex search**
+
 - Live search across title, author, tag, ISBN, notes, and date
 - Toggle for case-insensitive matching
 - Matches highlighted with `<mark>`; invalid patterns report an error instead of breaking
 - Safe compilation — an unbalanced `(` never throws
 
 **Dashboard**
+
 - Total books, total pages, favourite tag, books added this week
 - Seven-day CSS bar chart with a text alternative for screen readers
 - Page target with progress bar; the status message is `polite` while under target and switches to `assertive` once exceeded
 
 **Data**
+
 - Auto-save to `localStorage` on every change
 - JSON export and import with full structural validation before anything is written
 - Merge or replace on import, duplicate-ID detection, 10,000-book cap, 5 MB file cap
 - `seed.json` with 12 diverse records to load as a starting library
 
 **Interface**
+
 - Mobile-first responsive layout across four breakpoints
 - Semantic landmarks, skip link, visible focus, ARIA live regions
 - Reduced-motion support via `prefers-reduced-motion`
@@ -145,24 +149,24 @@ All patterns live in `scripts/config.js` and are shared by the form, the record 
 
 ### Validation
 
-| Pattern | Purpose | Example |
-| --- | --- | --- |
-| `/^\S(?:.*\S)?$/` | No leading or trailing whitespace | `Atomic Habits` ✅ · ` Atomic` ❌ |
-| `/\s{2,}/` | No collapsed double spaces | `Deep Work` ✅ · `Deep  Work` ❌ |
-| `/^(0\|[1-9]\d*)$/` | Pages: whole number, no leading zero | `320` ✅ · `0320` ❌ · `32.0` ❌ |
-| `/^\d{4}-(0[1-9]\|1[0-2])-(0[1-9]\|[12]\d\|3[01])$/` | Date in `YYYY-MM-DD` | `2025-09-29` ✅ · `2025-13-01` ❌ |
-| `/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/` | Tag: letters separated by spaces or hyphens | `Self-Development` ✅ · `Sci2Fi` ❌ |
-| `/^rec_[A-Za-z0-9_-]{1,60}$/` | Record ID shape | `rec_0001` ✅ |
-| `/^[1-9]\d*$/` | Page target | `1000` ✅ · `0` ❌ |
+| Pattern                                              | Purpose                                     | Example                             |
+| ---------------------------------------------------- | ------------------------------------------- | ----------------------------------- |
+| `/^\S(?:.*\S)?$/`                                    | No leading or trailing whitespace           | `Atomic Habits` ✅ · ` Atomic` ❌   |
+| `/\s{2,}/`                                           | No collapsed double spaces                  | `Deep Work` ✅ · `Deep  Work` ❌    |
+| `/^(0\|[1-9]\d*)$/`                                  | Pages: whole number, no leading zero        | `320` ✅ · `0320` ❌ · `32.0` ❌    |
+| `/^\d{4}-(0[1-9]\|1[0-2])-(0[1-9]\|[12]\d\|3[01])$/` | Date in `YYYY-MM-DD`                        | `2025-09-29` ✅ · `2025-13-01` ❌   |
+| `/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/`                    | Tag: letters separated by spaces or hyphens | `Self-Development` ✅ · `Sci2Fi` ❌ |
+| `/^rec_[A-Za-z0-9_-]{1,60}$/`                        | Record ID shape                             | `rec_0001` ✅                       |
+| `/^[1-9]\d*$/`                                       | Page target                                 | `1000` ✅ · `0` ❌                  |
 
 ### Advanced — back-references and lookahead-free extraction
 
-| Pattern | Purpose | Example |
-| --- | --- | --- |
-| `/\b(\p{L}\p{N}_]+)\s+\1\b/iu` | **Back-reference.** Catches a word repeated next to itself | `the the book` ❌ |
-| `/(?:97[89][\d\s-]{10,17}\d\|\d[\d\s-]{8,14}[\dXx])/g` | Pulls an ISBN candidate out of free text | `copy: 978-0-7352-1129-2` → `9780735211292` |
-| `/^\d{9}[\dX]$/` | ISBN-10 shape, then a mod-11 checksum | `0-306-40615-2` ✅ |
-| `/^(?:978\|979)\d{10}$/` | ISBN-13 shape, then a mod-10 checksum | `9780735211292` ✅ · `9780735211293` ❌ |
+| Pattern                                                | Purpose                                                    | Example                                     |
+| ------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------- |
+| `/\b(\p{L}\p{N}_]+)\s+\1\b/iu`                         | **Back-reference.** Catches a word repeated next to itself | `the the book` ❌                           |
+| `/(?:97[89][\d\s-]{10,17}\d\|\d[\d\s-]{8,14}[\dXx])/g` | Pulls an ISBN candidate out of free text                   | `copy: 978-0-7352-1129-2` → `9780735211292` |
+| `/^\d{9}[\dX]$/`                                       | ISBN-10 shape, then a mod-11 checksum                      | `0-306-40615-2` ✅                          |
+| `/^(?:978\|979)\d{10}$/`                               | ISBN-13 shape, then a mod-10 checksum                      | `9780735211292` ✅ · `9780735211293` ❌     |
 
 > ISBNs must pass both the shape **and** the checksum. Dates must exist in the real calendar, so `2025-02-30` is rejected.
 
@@ -172,18 +176,18 @@ All patterns live in `scripts/config.js` and are shared by the form, the record 
 
 Search runs against title, author, tag, ISBN, notes, and date joined by newlines.
 
-| Pattern | What it finds |
-| --- | --- |
-| `Atomic\|Clear` | Books by either author |
-| `^The` | Titles starting with "The" |
-| `\bdesign\b` | The whole word only, not "designed" |
-| `\b(\w+)\s+\1\b` | Records with a repeated adjacent word |
-| `Self-Development` | A literal tag |
-| `9780735211292` | A book by ISBN |
-| `\d{2}:\d{2}` | Time tokens inside notes |
-| `20\d{2}` | Any year from 2000 onward |
-| `[A-Z][a-z]+ [A-Z][a-z]+` | Capitalised word pairs |
-| `[a-z](?=[A-Z])` | camelCase boundaries inside notes |
+| Pattern                   | What it finds                         |
+| ------------------------- | ------------------------------------- |
+| `Atomic\|Clear`           | Books by either author                |
+| `^The`                    | Titles starting with "The"            |
+| `\bdesign\b`              | The whole word only, not "designed"   |
+| `\b(\w+)\s+\1\b`          | Records with a repeated adjacent word |
+| `Self-Development`        | A literal tag                         |
+| `9780735211292`           | A book by ISBN                        |
+| `\d{2}:\d{2}`             | Time tokens inside notes              |
+| `20\d{2}`                 | Any year from 2000 onward             |
+| `[A-Z][a-z]+ [A-Z][a-z]+` | Capitalised word pairs                |
+| `[a-z](?=[A-Z])`          | camelCase boundaries inside notes     |
 
 An invalid pattern such as `a(` reports the error message inline and shows no matches rather than throwing.
 
@@ -191,13 +195,13 @@ An invalid pattern such as `a(` reports the error message inline and shows no ma
 
 ## Keyboard map
 
-| Key | Action |
-| --- | --- |
-| `Tab` / `Shift + Tab` | Move between controls |
-| `Enter` | Submit the book form; save the page target |
-| `Space` / `Enter` | Activate the focused button |
-| `Escape` | Close the delete dialog |
-| `Tab` | Move between a row's Edit and Delete buttons |
+| Key                   | Action                                       |
+| --------------------- | -------------------------------------------- |
+| `Tab` / `Shift + Tab` | Move between controls                        |
+| `Enter`               | Submit the book form; save the page target   |
+| `Space` / `Enter`     | Activate the focused button                  |
+| `Escape`              | Close the delete dialog                      |
+| `Tab`                 | Move between a row's Edit and Delete buttons |
 
 **Focus management**
 
@@ -223,13 +227,13 @@ Every input has a bound `<label>`. Help text and error messages are wired throug
 
 **Live regions**
 
-| Element | Role | Purpose |
-| --- | --- | --- |
-| `#global-status` | `status`, `aria-live="polite"` | Saves, deletes, imports, and errors |
-| `#form-notice` | `status` | Form submission result |
-| `#search-feedback` | `status` | Regex compilation errors |
-| `#settings-feedback` | `status` | Import and export results |
-| `#target-message` | `polite` → `assertive` | Polite under target, assertive once exceeded |
+| Element              | Role                           | Purpose                                      |
+| -------------------- | ------------------------------ | -------------------------------------------- |
+| `#global-status`     | `status`, `aria-live="polite"` | Saves, deletes, imports, and errors          |
+| `#form-notice`       | `status`                       | Form submission result                       |
+| `#search-feedback`   | `status`                       | Regex compilation errors                     |
+| `#settings-feedback` | `status`                       | Import and export results                    |
+| `#target-message`    | `polite` → `assertive`         | Polite under target, assertive once exceeded |
 
 **Other**
 
@@ -249,16 +253,16 @@ One record per book:
 
 ```jsonc
 {
-  "id": "rec_0001",                       // unique, matches /^rec_[A-Za-z0-9_-]{1,60}$/
-  "title": "Atomic Habits",               // no leading/trailing/double spaces
-  "author": "James Clear",                // co-authors separated by ", " or " and "
-  "pages": 320,                           // integer, 1–100,000
-  "tag": "Self-Development",              // letters, spaces, hyphens
-  "dateAdded": "2025-09-29",              // YYYY-MM-DD, real calendar date
-  "isbn": "9780735211292",                // optional, checksum-validated
-  "notes": "You fall to the level of your systems.",  // optional, max 10,000 chars
+  "id": "rec_0001", // unique, matches /^rec_[A-Za-z0-9_-]{1,60}$/
+  "title": "Atomic Habits", // no leading/trailing/double spaces
+  "author": "James Clear", // co-authors separated by ", " or " and "
+  "pages": 320, // integer, 1–100,000
+  "tag": "Self-Development", // letters, spaces, hyphens
+  "dateAdded": "2025-09-29", // YYYY-MM-DD, real calendar date
+  "isbn": "9780735211292", // optional, checksum-validated
+  "notes": "You fall to the level of your systems.", // optional, max 10,000 chars
   "createdAt": "2025-09-29T18:12:04.000Z", // preserved across edits
-  "updatedAt": "2025-09-29T18:12:04.000Z"  // bumped on every edit
+  "updatedAt": "2025-09-29T18:12:04.000Z", // bumped on every edit
 }
 ```
 
@@ -269,7 +273,9 @@ An export wraps these in an envelope:
   "schemaVersion": 1,
   "exportedAt": "2025-10-01T09:00:00.000Z",
   "app": "Book & Notes Vault",
-  "books": [ /* … */ ]
+  "books": [
+    /* … */
+  ],
 }
 ```
 
@@ -314,14 +320,14 @@ The summary line at the top turns green when all checks pass and red on any fail
 
 **Coverage — 93 assertions across 7 groups**
 
-| Group | What it checks |
-| --- | --- |
-| Regex validation rules | Every validation pattern against valid and invalid input |
-| Advanced regex | Back-references, repeated surnames, ISBN extraction and checksums |
-| Date, pages, text | Leap years, `2025-02-30`, numeric boundaries, length limits |
-| Form validation | Each field's error path, including optional fields left blank |
-| Record and list validation | The import path — bad IDs, duplicate IDs, wrong types |
-| Search and highlighting | Invalid patterns, anchors, alternation, markup escaping |
+| Group                       | What it checks                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| Regex validation rules      | Every validation pattern against valid and invalid input                       |
+| Advanced regex              | Back-references, repeated surnames, ISBN extraction and checksums              |
+| Date, pages, text           | Leap years, `2025-02-30`, numeric boundaries, length limits                    |
+| Form validation             | Each field's error path, including optional fields left blank                  |
+| Record and list validation  | The import path — bad IDs, duplicate IDs, wrong types                          |
+| Search and highlighting     | Invalid patterns, anchors, alternation, markup escaping                        |
 | Sorting, stats, persistence | Sort order, dashboard totals, `seed.json` integrity, `localStorage` round-trip |
 
 The suite reads `scripts/*.js` directly, so it tests the shipped code rather than a copy. Results are also exposed as `window.__testResults` for scripting.
@@ -342,20 +348,20 @@ who has the link, and a private video only works if the account itself is shared
 
 A 2–3 minute walkthrough should cover:
 
-| # | Show | Why it matters |
-| --- | --- | --- |
-| 1 | Live app at <https://fiacredev.github.io/Book-Notes-Vault/> | The deployed build, not a local copy |
-| 2 | Skip link, then `Tab` through the form | Keyboard-only navigation |
-| 3 | Add a book with an invalid title (`Atomic  Atomic`) | Back-reference catches the repeated word |
-| 4 | Enter a bad date (`2025-02-30`) and a bad ISBN | Calendar and checksum validation |
-| 5 | Search `\b(\w+)\s+\1\b`, then `9780735211292` | Regex search and `<mark>` highlighting |
-| 6 | Type `a(` into the search box | Invalid pattern errors instead of crashing |
-| 7 | Sort by pages, then A–Z | Sorting and re-render |
-| 8 | Export JSON, then re-import it | Import/export round-trip |
-| 9 | Import a deliberately broken file | Validation rejects it, library untouched |
-| 10 | Resize to 360px and 1024px | Table becomes cards, stats reflow |
-| 11 | `tests.html` showing all green | The suite passing |
-| 12 | Set a page target under 99,999 pages | Target message switches to assertive |
+| #   | Show                                                        | Why it matters                             |
+| --- | ----------------------------------------------------------- | ------------------------------------------ |
+| 1   | Live app at <https://fiacredev.github.io/Book-Notes-Vault/> | The deployed build, not a local copy       |
+| 2   | Skip link, then `Tab` through the form                      | Keyboard-only navigation                   |
+| 3   | Add a book with an invalid title (`Atomic  Atomic`)         | Back-reference catches the repeated word   |
+| 4   | Enter a bad date (`2025-02-30`) and a bad ISBN              | Calendar and checksum validation           |
+| 5   | Search `\b(\w+)\s+\1\b`, then `9780735211292`               | Regex search and `<mark>` highlighting     |
+| 6   | Type `a(` into the search box                               | Invalid pattern errors instead of crashing |
+| 7   | Sort by pages, then A–Z                                     | Sorting and re-render                      |
+| 8   | Export JSON, then re-import it                              | Import/export round-trip                   |
+| 9   | Import a deliberately broken file                           | Validation rejects it, library untouched   |
+| 10  | Resize to 360px and 1024px                                  | Table becomes cards, stats reflow          |
+| 11  | `tests.html` showing all green                              | The suite passing                          |
+| 12  | Set a page target under 99,999 pages                        | Target message switches to assertive       |
 
 ---
 
@@ -363,9 +369,9 @@ A 2–3 minute walkthrough should cover:
 
 Two `localStorage` keys hold everything:
 
-| Key | Contents |
-| --- | --- |
-| `book-notes-vault.records.v1` | The book array |
+| Key                            | Contents        |
+| ------------------------------ | --------------- |
+| `book-notes-vault.records.v1`  | The book array  |
 | `book-notes-vault.settings.v1` | The page target |
 
 Notes never leave your browser unless you export them. The app sends no network requests, has no analytics, and uses no cookies.
@@ -384,12 +390,12 @@ Export regular backups. Clearing browser data will erase the vault.
 
 Mobile-first: base styles target ~360px, then layers up.
 
-| Breakpoint | Layout |
-| --- | --- |
-| Base (≤390px) | Single column, collapsed nav behind a Menu toggle, card list, stacked form |
-| ≤767px | Wider gutters, larger tap targets |
-| ≤1024px | Two-column stats grid, dashboard panels side by side |
-| >1024px | Four-column stats grid, full table with per-row actions, hero artwork visible |
+| Breakpoint    | Layout                                                                        |
+| ------------- | ----------------------------------------------------------------------------- |
+| Base (≤390px) | Single column, collapsed nav behind a Menu toggle, card list, stacked form    |
+| ≤767px        | Wider gutters, larger tap targets                                             |
+| ≤1024px       | Two-column stats grid, dashboard panels side by side                          |
+| >1024px       | Four-column stats grid, full table with per-row actions, hero artwork visible |
 
 Also handled: `prefers-reduced-motion`, table-to-card switching for the library, and horizontal overflow on the table wrapper at narrow widths.
 
@@ -403,12 +409,6 @@ Also handled: `prefers-reduced-motion`, table-to-card switching for the library,
 - The repeated-surname check can produce false positives on genuinely different authors sharing a surname
 - Very large libraries rely on full re-renders, which is fine at the 10,000-book cap but not tuned for it
 - Complex search patterns run against every record on each keystroke
-
----
-
-## License
-
-Add a license before distributing — MIT, GPL, or whichever your course requires.
 
 ---
 
