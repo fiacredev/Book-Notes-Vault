@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "app": "Book & Notes Vault",
+  "exportedAt": "2025-10-01T09:00:00.000Z",
+  "books": [
+    {
+      "id": "rec_0001",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "pages": 320,
+      "tag": "Self-Development",
+      "dateAdded": "2025-09-29",
+      "isbn": "9780735211292",
+      "notes": "You do not rise to the level of your goals. You fall to the level of your systems. Identity-based habits: every action is a vote for the person you want to become.",
+      "createdAt": "2025-09-29T18:12:04.000Z",
+      "updatedAt": "2025-09-29T18:12:04.000Z"
+    },
+    {
+      "id": "rec_0002",
+      "title": "Deep Work: Rules for Focused Success in a Distracted World",
+      "author": "Cal Newport",
+      "pages": 296,
+      "tag": "Productivity",
+      "dateAdded": "2025-09-27",
+      "isbn": "9781455586691",
+      "notes": "Shallow work feels productive because it is measurable. Depth produces results that compound quietly over years.",
+      "createdAt": "2025-09-27T07:40:51.000Z",
+      "updatedAt": "2025-09-28T12:03:19.000Z"
+    },
+    {
+      "id": "rec_0003",
+      "title": "A Philosophy of Software Design",
+      "author": "John Ousterhout",
+      "pages": 190,
+      "tag": "Engineering",
+      "dateAdded": "2025-09-25",
+      "isbn": "9781491950357",
+      "notes": "Design it right the first time: fewer errors are better than fewer features. Comments should describe what is not obvious, not narrate the code.",
+      "createdAt": "2025-09-25T21:05:33.000Z",
+      "updatedAt": "2025-09-25T21:05:33.000Z"
+    },
+    {
+      "id": "rec_0004",
+      "title": "The Pragmatic Programmer",
+      "author": "Andrew Hunt; David Thomas",
+      "pages": 352,
+      "tag": "Engineering",
+      "dateAdded": "2025-09-22",
+      "isbn": "9780201616224",
+      "notes": "Your knowledge is a garden that grows stale unless you water it. Broken window theory applies to codebases and to teams.",
+      "createdAt": "2025-09-22T11:11:11.000Z",
+      "updatedAt": "2025-09-22T11:11:11.000Z"
+    },
+    {
+      "id": "rec_0005",
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "pages": 443,
+      "tag": "History",
+      "dateAdded": "2025-09-20",
+      "isbn": "9780062316097",
+      "notes": "The Agricultural Revolution was not a triumph for individual humans — the wheat domesticated us. Shared fictions let strangers cooperate at scale.",
+      "createdAt": "2025-09-20T08:00:00.000Z",
+      "updatedAt": "2025-09-20T08:00:00.000Z"
+    },
+    {
+      "id": "rec_0006",
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "pages": 464,
+      "tag": "Engineering",
+      "dateAdded": "2025-09-18",
+      "isbn": "9780132350884",
+      "notes": "A long function is a smell. Duplicated knowledge is the root of most maintenance pain. Duplicated du du du du du is a typo, not a book title.",
+      "createdAt": "2025-09-18T16:22:47.000Z",
+      "updatedAt": "2025-09-19T09:15:00.000Z"
+    },
+    {
+      "id": "rec_0007",
+      "title": "Thinking, Fast and Slow",
+      "author": "Daniel Kahneman",
+      "pages": 499,
+      "tag": "Psychology",
+      "dateAdded": "2025-09-14",
+      "isbn": "9780374533557",
+      "notes": "System 1 is fast, automatic and confident. System 2 is lazy and expensive, so it accepts System 1's answer far more often than it should.",
+      "createdAt": "2025-09-14T10:30:00.000Z",
+      "updatedAt": "2025-09-14T10:30:00.000Z"
+    },
+    {
+      "id": "rec_0008",
+      "title": "The Design of Everyday Things",
+      "author": "Don Norman",
+      "pages": 368,
+      "tag": "Design",
+      "dateAdded": "2025-09-02",
+      "isbn": "9780465050659",
+      "notes": "Good design is obvious when it works. Affordances and signifiers should make the correct action the easiest action.",
+      "createdAt": "2025-09-02T13:44:09.000Z",
+      "updatedAt": "2025-09-05T17:20:31.000Z"
+    },
+    {
+      "id": "rec_0009",
+      "title": "One Hundred Years of Solitude",
+      "author": "Gabriel Garcia Marquez",
+      "pages": 417,
+      "tag": "Fiction",
+      "dateAdded": "2025-08-28",
+      "isbn": "",
+      "notes": "Memory is circular and unreliable. Rainy April lasted only ten days, which is a plausible line to test against notes for typos.",
+      "createdAt": "2025-08-28T20:02:00.000Z",
+      "updatedAt": "2025-08-28T20:02:00.000Z"
+    },
+    {
+      "id": "rec_0010",
+      "title": "The Mythical Man-Month",
+      "author": "Frederick P. Brooks Jr.",
+      "pages": 322,
+      "tag": "Engineering",
+      "dateAdded": "2025-08-15",
+      "isbn": "9780201835953",
+      "notes": "Adding people to a late project makes it later. Communication paths grow quadratically with team size.",
+      "createdAt": "2025-08-15T06:18:25.000Z",
+      "updatedAt": "2025-08-16T11:00:00.000Z"
+    },
+    {
+      "id": "rec_0011",
+      "title": "Meditations",
+      "author": "Marcus Aurelius",
+      "pages": 254,
+      "tag": "Philosophy",
+      "dateAdded": "2025-01-01",
+      "isbn": "9780140449334",
+      "notes": "Edge case for the date validator: January 1 is the oldest record in the vault. 01/01 is not a valid entry format.",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "rec_0012",
+      "title": "Flatland",
+      "author": "Edwin Abbott",
+      "pages": 100000,
+      "tag": "Mathematics",
+      "dateAdded": "2025-12-31",
+      "isbn": "9780486287478",
+      "notes": "Largest allowed page count (99,999). This pushes the vault over any small page target so the assertive target message can be demonstrated.",
+      "createdAt": "2025-12-31T23:59:59.000Z",
+      "updatedAt": "2025-12-31T23:59:59.000Z"
+    }
+  ]
+}
