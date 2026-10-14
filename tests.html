@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Suite — Book &amp; Notes Vault</title>
+  <style>
+    :root { --ok:#1b7f4b; --bad:#b3261e; --muted:#5c6470; --line:#d8dde5; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:#16191d; background:#f7f8fa; }
+    header, main { max-width: 960px; margin: 0 auto; padding: 24px 20px; }
+    h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    h2 { font-size: 1.15rem; margin: 28px 0 8px; }
+    .lede { color: var(--muted); margin: 0 0 20px; }
+    .summary { padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-weight: 600; }
+    .summary.pass { border-color: var(--ok); color: var(--ok); }
+    .summary.fail { border-color: var(--bad); color: var(--bad); }
+    ol { padding-left: 22px; }
+    li { margin: 2px 0; }
+    li.pass::marker { color: var(--ok); }
+    li.fail { color: var(--bad); font-weight: 600; }
+    code { background:#eef0f4; padding:1px 5px; border-radius:4px; font-size:.9em; }
+    .hint { color: var(--muted); font-size:.92rem; }
+    a { color:#1f5fa8; }
+  </style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header>
+  <h1>Test Suite</h1>
+  <p class="lede">Book &amp; Notes Vault — regex validation, record validation, search, sorting, and persistence checks. No frameworks.</p>
+  <p class="hint"><a href="index.html">← Back to the app</a></p>
+</header>
+
+<main id="main-content" tabindex="-1">
+  <div id="summary" class="summary" role="status" aria-live="polite">Running tests…</div>
+  <div id="results"></div>
+</main>
+
+<script type="module">
+import { PATTERNS } from "./scripts/config.js";
+import {
+  checksumValidIsbn, extractIsbn, hasDuplicateWords, hasRepeatedSurname,
+  isValidDate, isValidPages, isValidText, validateBookList, validateBookRecord, validateFormValues
+} from "./scripts/validators.js";
+import { compileSearch, filterAndSort, highlight, matchesSearch, getSearchState } from "./scripts/search.js";
+import { lastSevenDates, computeStats } from "./scripts/stats.js";
+import { localDate } from "./scripts/utils.js";
+import { withDefaults } from "./scripts/storage.js";
+
+const results = document.getElementById("results");
+const summary = document.getElementById("summary");
+let passed = 0;
+let failed = 0;
+let currentGroup = null;
+
+function group(title) {
+  currentGroup = document.createElement("h2");
+  currentGroup.textContent = title;
+  const list = document.createElement("ol");
+  results.append(currentGroup, list);
+  return list;
+}
+
+/** assert(label, condition, detail) records a visible pass/fail line. */
+function assert(list, label, condition, detail = "") {
+  const item = document.createElement("li");
+  item.className = condition ? "pass" : "fail";
+  item.textContent = condition ? `PASS — ${label}` : `FAIL — ${label}${detail ? ` (${detail})` : ""}`;
+  list.appendChild(item);
+  condition ? passed++ : failed++;
+}
+
+const eq = (list, label, actual, expected) =>
+  assert(list, `${label} → expected ${JSON.stringify(expected)}`, Object.is(actual, expected), `got ${JSON.stringify(actual)}`);
+
+const validBook = (overrides = {}) => ({
+  id: "rec_0001", title: "Atomic Habits", author: "James Clear", pages: 320,
+  tag: "Self-Development", dateAdded: "2025-09-29", isbn: "9780735211292", notes: "Systems, not goals.",
+  createdAt: "2025-09-29T18:12:04.000Z", updatedAt: "2025-09-29T18:12:04.000Z", ...overrides
+});
+
+// ---------------------------------------------------------------- validators
+{
+  const list = group("Regex validation rules");
+
+  assert(list, "title pattern rejects leading/trailing space", !PATTERNS.title.test(" Atomic"));
+  assert(list, "title pattern rejects trailing space", !PATTERNS.title.test("Atomic "));
+  assert(list, "title pattern accepts a single word", PATTERNS.title.test("Dune"));
+  assert(list, "double-space pattern rejects collapsed gaps", PATTERNS.doubleSpace.test("Deep  Work"));
+  assert(list, "pages pattern accepts 0 (pattern-level)", PATTERNS.pages.test("0"));
+  assert(list, "pages pattern rejects leading zero", !PATTERNS.pages.test("0320"));
+  assert(list, "pages pattern rejects decimals", !PATTERNS.pages.test("32.0"));
+  assert(list, "date pattern rejects month 13", !PATTERNS.date.test("2025-13-01"));
+  assert(list, "date pattern accepts 2025-09-29", PATTERNS.date.test("2025-09-29"));
+  assert(list, "tag pattern accepts hyphenated words", PATTERNS.tag.test("Self-Development"));
+  assert(list, "tag pattern accepts spaced words", PATTERNS.tag.test("Deep Work"));
+  assert(list, "tag pattern rejects digits", !PATTERNS.tag.test("Sci-Fi 2"));
+  assert(list, "tag pattern rejects leading hyphen", !PATTERNS.tag.test("-Science"));
+}
+
+// ------------------------------------------------- advanced regex: back-reference
+{
+  const list = group("Advanced regex — back-references");
+
+  assert(list, "duplicate word detected", hasDuplicateWords("the the book"));
+  assert(list, "duplicate word is case-insensitive", hasDuplicateWords("Very very long"));
+  assert(list, "no duplicate across a word boundary gap", !hasDuplicateWords("deep work deep focus"));
+  assert(list, "repeated surname detected", hasRepeatedSurname("Andrew Hunt; David Hunt"));
+  assert(list, "distinct surnames accepted", !hasRepeatedSurname("Andrew Hunt; David Thomas"));
+  assert(list, "ISBN extracted from surrounding text", extractIsbn("copy: 978-0-7352-1129-2 done") === "9780735211292");
+  eq(list, "ISBN-13 checksum rejects a bad check digit", checksumValidIsbn("9780735211293"), null);
+  eq(list, "ISBN-10 checksum accepts 0-306-40615-2", checksumValidIsbn("0-306-40615-2"), "0306406152");
+  assert(list, "ISBN candidates found via regex", PATTERNS.isbnCandidate.test("9780735211292"));
+  PATTERNS.isbnCandidate.lastIndex = 0;
+}
+
+// ------------------------------------------------------------------ date/pages
+{
+  const list = group("Date, pages and text validators");
+
+  assert(list, "real calendar date accepted", isValidDate("2025-09-29"));
+  assert(list, "impossible day rejected", !isValidDate("2025-02-30"));
+  assert(list, "leap day accepted", isValidDate("2024-02-29"));
+  assert(list, "non-leap Feb 29 rejected", !isValidDate("2025-02-29"));
+  assert(list, "pages 1 accepted", isValidPages("1"));
+  assert(list, "pages 0 rejected", !isValidPages("0"));
+  assert(list, "pages 100000 accepted", isValidPages("100000"));
+  assert(list, "pages 100001 rejected", !isValidPages("100001"));
+  assert(list, "text with extra spaces rejected", !isValidText("Deep  Work", 180));
+  assert(list, "clean text accepted", isValidText("Deep Work", 180));
+  assert(list, "over-length text rejected", !isValidText("x".repeat(181), 180));
+}
+
+// ------------------------------------------------------------- form validation
+{
+  const list = group("Form validation");
+  const base = { title: "Atomic Habits", author: "James Clear", pages: "320", tag: "Self-Development", dateAdded: "2025-09-29", isbn: "", notes: "" };
+
+  eq(list, "clean form has no errors", Object.keys(validateFormValues(base)).length, 0);
+  assert(list, "leading space in title flagged", Boolean(validateFormValues({ ...base, title: " Atomic" }).title));
+  assert(list, "repeated word in title flagged", Boolean(validateFormValues({ ...base, title: "Atomic Atomic" }).title));
+  assert(list, "pages with decimal flagged", Boolean(validateFormValues({ ...base, pages: "320.5" }).pages));
+  assert(list, "invalid date flagged", Boolean(validateFormValues({ ...base, dateAdded: "2025-02-30" }).dateAdded));
+  assert(list, "digit in tag flagged", Boolean(validateFormValues({ ...base, tag: "Sci2Fi" }).tag));
+  assert(list, "bad ISBN flagged", Boolean(validateFormValues({ ...base, isbn: "9780735211293" }).isbn));
+  assert(list, "empty optional ISBN accepted", validateFormValues({ ...base, isbn: "   " }).isbn === undefined);
+  assert(list, "over-length notes flagged", Boolean(validateFormValues({ ...base, notes: "x".repeat(10001) }).notes));
+  assert(list, "missing title flagged", Boolean(validateFormValues({ ...base, title: "" }).title));
+}
+
+// ------------------------------------------------------------ record validation
+{
+  const list = group("Record and list validation (import path)");
+  const record = validBook();
+
+  eq(list, "valid record accepted", validateBookRecord(record), null);
+  assert(list, "non-object record rejected", Boolean(validateBookRecord("nope")));
+  assert(list, "bad id rejected", Boolean(validateBookRecord({ ...record, id: "book-1" })));
+  assert(list, "invalid ISBN in record rejected", Boolean(validateBookRecord({ ...record, isbn: "12345" })));
+  assert(list, "non-string notes rejected", Boolean(validateBookRecord({ ...record, notes: 42 })));
+  assert(list, "bad timestamp rejected", Boolean(validateBookRecord({ ...record, updatedAt: "not-a-date" })));
+
+  eq(list, "valid list accepted", validateBookList([record, { ...record, id: "rec_0002" }]).error, undefined);
+  assert(list, "duplicate ids rejected", Boolean(validateBookList([record, record]).error));
+  assert(list, "non-array rejected", Boolean(validateBookList({}).error));
+
+  const defaults = withDefaults({ ...record, isbn: undefined, notes: undefined });
+  eq(list, "withDefaults fills isbn", defaults.isbn, "");
+  eq(list, "withDefaults fills notes", defaults.notes, "");
+}
+
+// ---------------------------------------------------------------------- search
+{
+  const list = group("Regex search and highlighting");
+  const book = validBook();
+
+  compileSearch("habits", true);
+  assert(list, "case-insensitive match", matchesSearch(book));
+  assert(list, "highlight wraps the match", highlight(book.title) === "Atomic <mark>Habits</mark>");
+
+  compileSearch("HABITS", false);
+  assert(list, "case-sensitive search can miss", !matchesSearch(book));
+
+  compileSearch("Atomic|Clear", false);
+  assert(list, "alternation matches", matchesSearch(book));
+
+  compileSearch("a(", true);
+  assert(list, "invalid pattern flagged", Boolean(getSearchState().error));
+  assert(list, "invalid pattern matches nothing instead of throwing", !matchesSearch(book));
+
+  compileSearch("9780735211292", true);
+  assert(list, "search covers the ISBN field", matchesSearch(book));
+
+  compileSearch("systems", true);
+  assert(list, "search covers the notes field", matchesSearch(book));
+
+  compileSearch("^Atomic", true);
+  assert(list, "anchored search works", matchesSearch(book));
+
+  compileSearch("<img", true);
+  assert(list, "highlight escapes markup", !highlight(book.title).includes("<img"));
+
+  compileSearch("", true);
+  assert(list, "empty pattern matches everything", matchesSearch(book));
+}
+
+// -------------------------------------------------------------- sorting/filter
+{
+  const list = group("Sorting");
+  const a = validBook({ id: "rec_0001", title: "Zebra", pages: 10, dateAdded: "2025-01-01" });
+  const b = validBook({ id: "rec_0002", title: "Apple", pages: 99, dateAdded: "2025-06-01" });
+  const books = [a, b];
+
+  eq(list, "pages ascending", filterAndSort(books, "pages-asc").map(x => x.pages).join(","), "10,99");
+  eq(list, "pages descending", filterAndSort(books, "pages-desc").map(x => x.pages).join(","), "99,10");
+  eq(list, "title ascending", filterAndSort(books, "title-asc").map(x => x.title).join(","), "Apple,Zebra");
+  eq(list, "date newest first", filterAndSort(books, "date-desc").map(x => x.dateAdded).join(","), "2025-06-01,2025-01-01");
+
+  compileSearch("apple", true);
+  eq(list, "regex filter narrows the list", filterAndSort(books, "title-asc").length, 1);
+  compileSearch("", true);
+}
+
+// ----------------------------------------------------------------------- stats
+{
+  const list = group("Stats and page target");
+  const dates = lastSevenDates(new Date("2025-10-03T09:00:00"));
+  eq(list, "chart covers seven days", dates.length, 7);
+  eq(list, "chart ends today", dates[6], "2025-10-03");
+  eq(list, "chart starts six days ago", dates[0], "2025-09-27");
+
+  // Dates are relative to today so this check stays true whenever the suite runs.
+  const [sixDaysAgo, fiveDaysAgo] = lastSevenDates().slice(0, 2);
+  const books = [
+    validBook({ id: "rec_0001", pages: 100, tag: "Engineering", dateAdded: localDate() }),
+    validBook({ id: "rec_0002", pages: 50, tag: "Engineering", dateAdded: sixDaysAgo }),
+    validBook({ id: "rec_0003", pages: 25, tag: "History", dateAdded: fiveDaysAgo })
+  ];
+  const stats = computeStats(books, { pageTarget: 100 });
+  eq(list, "total books", stats.totalBooks, 3);
+  eq(list, "total pages summed", stats.totalPages, 175);
+  eq(list, "top tag is the most common", stats.topTag[0], "Engineering");
+  eq(list, "books added in the last seven days", stats.weekTotal, 3);
+  assert(list, "total pages over the target is detectable", stats.totalPages > stats.pageTarget);
+
+  const emptyStats = computeStats([], { pageTarget: 100 });
+  eq(list, "empty vault reports zero books", emptyStats.totalBooks, 0);
+  eq(list, "empty vault has no top tag", emptyStats.topTag, undefined);
+}
+
+// ------------------------------------------------------------------ seed.json
+{
+  const list = group("seed.json integrity");
+  try {
+    const response = await fetch("./seed.json");
+    const seed = await response.json();
+    eq(list, "seed contains at least 10 books", seed.books.length >= 10, true);
+    const errors = seed.books.map(validateBookRecord).filter(Boolean);
+    eq(list, "every seed record passes validation", errors.length, 0);
+    assert(list, "seed ids are unique", new Set(seed.books.map(b => b.id)).size === seed.books.length);
+    assert(list, "seed exercises the page cap", seed.books.some(b => b.pages >= 100000));
+  } catch (error) {
+    assert(list, `seed.json loads (${error.message})`, false);
+  }
+}
+
+// ------------------------------------------------------------------ persistence
+{
+  const list = group("localStorage round-trip");
+  const KEY = "book-notes-vault.test";
+  try {
+    const books = [validBook(), { ...validBook(), id: "rec_0002", title: "Flatland" }];
+    localStorage.setItem(KEY, JSON.stringify(books));
+    const restored = JSON.parse(localStorage.getItem(KEY));
+    eq(list, "records survive a save/load cycle", restored.length, 2);
+    eq(list, "restored records still validate", validateBookList(restored).error, undefined);
+    localStorage.setItem(KEY, "{ not json");
+    let handled = false;
+    try { JSON.parse(localStorage.getItem(KEY)); } catch { handled = true; }
+    assert(list, "malformed stored JSON is handled, not crashed on", handled);
+  } finally {
+    localStorage.removeItem(KEY);
+  }
+}
+
+// -------------------------------------------------------------------- summary
+summary.className = `summary ${failed === 0 ? "pass" : "fail"}`;
+summary.textContent = failed === 0
+  ? `All ${passed} tests passed.`
+  : `${passed} passed, ${failed} failed.`;
+window.__testResults = { passed, failed };
+</script>
+
+</body>
+</html>
