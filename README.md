@@ -4,6 +4,9 @@ A calm, accessible personal library for keeping book details and your own readin
 
 Everything lives in your browser's `localStorage`. Export a JSON backup whenever you want a copy.
 
+> **Live app:** <https://fiacredev.github.io/Book-Notes-Vault/> ·
+> **Demo video:** _link to be added_ (see [Demo video](#demo-video))
+
 ---
 
 ## Contents
@@ -20,10 +23,11 @@ Everything lives in your browser's `localStorage`. Export a JSON backup whenever
 10. [Data model](#data-model)
 11. [How to run](#how-to-run)
 12. [How to run the tests](#how-to-run-the-tests)
-13. [Storage, import/export, and privacy](#storage-importexport-and-privacy)
-14. [Responsive breakpoints](#responsive-breakpoints)
-15. [Limitations](#limitations)
-16. [License](#license)
+13. [Demo video](#demo-video)
+14. [Storage, import/export, and privacy](#storage-importexport-and-privacy)
+15. [Responsive breakpoints](#responsive-breakpoints)
+16. [Limitations](#limitations)
+17. [License](#license)
 
 ---
 
@@ -46,19 +50,18 @@ Green reads as growth and focus; the cream/paper neutrals keep long reading sess
 
 ## Live demo
 
-**GitHub Pages:** not yet deployed. To publish:
+**Live site:** <https://fiacredev.github.io/Book-Notes-Vault/>
 
-```bash
-git branch gh-pages
-git push -u origin gh-pages
-```
+Hosted on GitHub Pages. The same app and the test suite are both reachable from the deployed build:
 
-Then enable **Settings → Pages → Source: `gh-pages` / root** on
-[fiacredev/Book-Notes-Vault](https://github.com/fiacredev/Book-Notes-Vault). The live URL will be:
+| Page | URL |
+| --- | --- |
+| App | <https://fiacredev.github.io/Book-Notes-Vault/> |
+| Test suite | <https://fiacredev.github.io/Book-Notes-Vault/tests.html> |
+| Seed data | <https://fiacredev.github.io/Book-Notes-Vault/seed.json> |
+| Repository | <https://github.com/fiacredev/Book-Notes-Vault> |
 
-```
-https://fiacredev.github.io/Book-Notes-Vault/
-```
+To republish after a change, push to `main` and GitHub Pages serves it.
 
 > Running locally? `python -m http.server 8000` and open <http://localhost:8000>. A server is required — ES modules and `fetch` are blocked on `file://`.
 
@@ -129,8 +132,9 @@ State is a single observable store. Every mutation follows the same commit path 
 │   ├── settings.js         Export, import, clear vault, page target
 │   ├── navigation.js       Mobile menu, scroll-spy for aria-current
 │   └── utils.js            DOM, escaping, and date helpers
+├── docs/SPEC.md            M1 specification, data model, accessibility plan
 ├── assets/                 Static assets
-└── .github/workflows/      GitHub Pages deployment
+└── codevibe-report/        Submission report
 ```
 
 ---
@@ -321,6 +325,37 @@ The summary line at the top turns green when all checks pass and red on any fail
 | Sorting, stats, persistence | Sort order, dashboard totals, `seed.json` integrity, `localStorage` round-trip |
 
 The suite reads `scripts/*.js` directly, so it tests the shipped code rather than a copy. Results are also exposed as `window.__testResults` for scripting.
+
+---
+
+## Demo video
+
+> **TODO — paste the unlisted YouTube link here before submitting.**
+>
+> `https://www.youtube.com/watch?v=_______________________`
+
+<!--
+Delete this block and replace it with the real link when the video is uploaded.
+Keep the video unlisted rather than private: the marker must resolve for a grader
+who has the link, and a private video only works if the account itself is shared.
+-->
+
+A 2–3 minute walkthrough should cover:
+
+| # | Show | Why it matters |
+| --- | --- | --- |
+| 1 | Live app at <https://fiacredev.github.io/Book-Notes-Vault/> | The deployed build, not a local copy |
+| 2 | Skip link, then `Tab` through the form | Keyboard-only navigation |
+| 3 | Add a book with an invalid title (`Atomic  Atomic`) | Back-reference catches the repeated word |
+| 4 | Enter a bad date (`2025-02-30`) and a bad ISBN | Calendar and checksum validation |
+| 5 | Search `\b(\w+)\s+\1\b`, then `9780735211292` | Regex search and `<mark>` highlighting |
+| 6 | Type `a(` into the search box | Invalid pattern errors instead of crashing |
+| 7 | Sort by pages, then A–Z | Sorting and re-render |
+| 8 | Export JSON, then re-import it | Import/export round-trip |
+| 9 | Import a deliberately broken file | Validation rejects it, library untouched |
+| 10 | Resize to 360px and 1024px | Table becomes cards, stats reflow |
+| 11 | `tests.html` showing all green | The suite passing |
+| 12 | Set a page target under 99,999 pages | Target message switches to assertive |
 
 ---
 
