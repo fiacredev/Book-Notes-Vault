@@ -1,0 +1,17 @@
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (not used — the app is dependency-free, but keep tooling artifacts out)
+node_modules/
+npm-debug.log*
+
+# Local exports
+*.local.json
+
+codevibe-report
